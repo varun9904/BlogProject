@@ -1,0 +1,50 @@
+# Image files
+1.png
+2.png
+3.png
+4.png
+5.png
+6.png
+
+# Extra/test files
+extra/
+test.txt
+
+# Node dependencies
+node_modules/
+quoteshare-server/node_modules/
+
+# Environment files
+.env
+*.local
+
+# Build output
+dist/
+dist-ssr/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor files
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python cache
+__pycache__/
+*.pyc
+*.zip
+*.pkl
+*.csv
