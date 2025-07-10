@@ -14,9 +14,9 @@ app.use(cors({
   credentials: true      
 }));
 
-
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json());
+// app.use(cookieParser());
 
 
 app.get("/", (req, res) => res.send("Welcome to the blogShare API"));
