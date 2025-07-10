@@ -1,18 +1,17 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-require("dotenv").config();
-
-const authRoutes = require("./routes/authRoutes");
-const blogRoutes = require("./routes/blogRoutes");
+import express from "express";
+import mongoose from "mongoose";  
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import "dotenv/config";
+import authRoutes from "./routes/authRoutes.js";
+import blogRoutes from "./routes/blogRoutes.js";
 
 const app = express();
 // app.use(cors());
 
 app.use(cors({
-  origin: "https://project-blog-share.vercel.app",
-  credentials: true            
+  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  credentials: true      
 }));
 
 
@@ -24,9 +23,11 @@ app.get("/", (req, res) => res.send("Welcome to the blogShare API"));
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 
-mongoose.connect(process.env.MONGO_URI).then(() => {
-  console.log("Connected to MongoDB");
-  app.listen(process.env.PORT || 5000, () =>
-    console.log(`Server running on http://localhost:${process.env.PORT || 5000}`)
-  );
-}).catch(console.error);
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(process.env.PORT || 5000, () =>
+      console.log(`Server running on http://localhost:${process.env.PORT || 5000}`)
+    );
+  })
+  .catch(console.error);

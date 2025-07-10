@@ -1,9 +1,8 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-
-module.exports = async (req, res, next) => {
-  const token = req.cookies?.token; // ✅ Read token from cookies
+export default async (req, res, next) => {
+  const token = req.cookies?.token; 
   console.log(req.cookies);
   console.log("Token from cookie:", token);
   if (!token) return res.status(401).json({ message: "Access Denied" });

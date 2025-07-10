@@ -1,19 +1,18 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
-  text: String,
-  flagged: Boolean,
+  text: { type: String, required: true },
+  flagged: { type: Boolean, default: false },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
 const blogSchema = new mongoose.Schema({
-  title: String,
-  text: String,
-  flagged: Boolean,
+  title: { type: String, required: true },
+  text: { type: String, required: true },
+  flagged: { type: Boolean, default: false },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   comments: [commentSchema],
-},{ timestamps: true }
-);
+}, { timestamps: true });
 
-module.exports = mongoose.model("blog", blogSchema);
+export const blogModel = mongoose.model("blog", blogSchema);
