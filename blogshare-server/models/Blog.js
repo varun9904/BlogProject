@@ -15,4 +15,5 @@ const blogSchema = new mongoose.Schema({
   comments: [commentSchema],
 }, { timestamps: true });
 
-export const blogModel = mongoose.model("blog", blogSchema);
+const blogModel = mongoose.model("blog", blogSchema);
+export default blogModel;
