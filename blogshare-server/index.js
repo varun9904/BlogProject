@@ -25,6 +25,7 @@ app.use(express.json());
 
 
 app.get("/", (req, res) => res.send("Welcome to the blogShare API"));
+app.get("/ping", (req, res) => res.send("pong")); 
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 

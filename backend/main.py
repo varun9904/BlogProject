@@ -141,3 +141,10 @@ async def predict_audio(file: UploadFile = File(...)):
                 os.remove(temp_file_path)
         except PermissionError as e:
             return {"error": f"Permission error while removing the file: {str(e)}"}
+        
+
+
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
