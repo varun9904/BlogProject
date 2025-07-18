@@ -103,9 +103,16 @@ export default function Dashboard() {
       <div className="w-full px-4 sm:px-8 lg:px-16 mx-auto">
         {/* 🌟 Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-          <h1 className="text-4xl sm:text-5xl font-extrabold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-200">
-            BlogShare
-          </h1>
+          <div className="flex items-center gap-3">
+            <img
+              src="/Loading_Square.gif"
+              alt="logo gif"
+              className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+            />
+            <h1 className="text-4xl sm:text-5xl font-extrabold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-200 animate-pulse">
+              BlogShare
+            </h1>
+          </div>
           {isLoading && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <GifComponent />
