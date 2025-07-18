@@ -1,23 +1,32 @@
 import Blog from "../models/Blog.js";
 import jwt from "jsonwebtoken";
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config();
 
 const checkHateSpeech = async (text) => {
   try {
-    const res = await fetch(`${process.env.VITE_AI_URL}/predict`, {
+    const url = process.env.AI_URL + "/predict";
+    console.log("Calling AI_URL:", url);
+
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
     });
+
     const data = await res.json();
+    console.log("Model response:", data);
+
     const flagged = data.prediction === "Hate Speech";
     const hatePercent = (data.probabilities?.hate || 0) * 100;
+
     return { flagged, hatePercent };
   } catch (err) {
     console.error("Error in hate speech detection:", err);
     return { flagged: false, hatePercent: 0 };
   }
 };
+
 
 export const createBlog = async (req, res) => {
   console.log("req.userId:", req.userId);
