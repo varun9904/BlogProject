@@ -2,18 +2,22 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getBlogs, likeBlog, addComment } from "../services/api";
 import toast from "react-hot-toast";
+import GifComponent from "../components/LoadingGif";
 
 export default function PublicProfile() {
   const { authorId, blogId } = useParams();
   const [blog, setBlog] = useState(null);
   const [comment, setComment] = useState("");
   const [liked, setLiked] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, [authorId, blogId]);
 
   const fetchData = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       const res = await getBlogs();
       const filtered = res.data.find(
@@ -24,6 +28,8 @@ export default function PublicProfile() {
       setBlog(filtered || null);
     } catch {
       toast.error("Error loading blog");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,12 +47,13 @@ export default function PublicProfile() {
   const handleComment = async (e) => {
     e.preventDefault();
     if (!comment || !blog) return;
+
     try {
-      await addComment(blog._id, { text: comment });
+      const res = await addComment(blog._id, { text: comment }); // ✅ store result
       console.log("Add comment response:", res.data);
       setComment("");
       setBlog(res.data.blog);
-    } catch {
+    } catch (err) {
       toast.error("Failed to comment");
       fetchData();
     }
@@ -55,6 +62,11 @@ export default function PublicProfile() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-neutral-950 px-4 sm:px-8 py-12 md:py-16 transition-all duration-500">
       <div className="max-w-6xl mx-auto relative">
+        {isLoading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <GifComponent />
+          </div>
+        )}
         {blog ? (
           <>
             {/* 🧾 Blog Title */}
@@ -111,7 +123,7 @@ export default function PublicProfile() {
               {blog.comments?.length > 0 && (
                 <div className="mt-8 max-h-72 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-400 scrollbar-track-zinc-700 space-y-5">
                   {blog.comments.map((c) => {
-                    console.log("Rendering comment:", c); 
+                    console.log("Rendering comment:", c);
                     return (
                       <div
                         key={c._id}

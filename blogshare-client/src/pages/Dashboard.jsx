@@ -8,6 +8,7 @@ import {
   deleteBlog,
   logoutUser,
 } from "../services/api";
+import GifComponent from "../components/LoadingGif";
 
 const user = JSON.parse(localStorage.getItem("user"));
 
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const [title, setTitle] = useState("");
   const [blogs, setBlogs] = useState([]);
   const [search, setSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   // const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -24,12 +26,16 @@ export default function Dashboard() {
   }, []);
 
   const fetchBlogs = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       const res = await getBlogs();
       setBlogs(res.data);
     } catch (err) {
       toast.error("Failed to fetch blogs");
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,7 +51,7 @@ export default function Dashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!blog) return toast.error("Please write a blog!");
-    console.log(blog)
+    console.log(blog);
 
     try {
       console.log(title);
@@ -95,12 +101,16 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-neutral-950 px-4 py-10 text-white">
       <div className="w-full px-4 sm:px-8 lg:px-16 mx-auto">
-
         {/* 🌟 Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-4xl sm:text-5xl font-extrabold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-200">
             BlogShare
           </h1>
+          {isLoading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <GifComponent />
+            </div>
+          )}
 
           <div className="flex gap-3">
             <Link
@@ -193,14 +203,16 @@ export default function Dashboard() {
                     💜 {q.likes?.length || 0}
                   </button>
                   <span>💬 {q.comments?.length || 0}</span>
-                  {(user && q.user && (q.user === user._id || q.user._id === user._id)) && (
-                    <button
-                      onClick={() => handleDelete(q._id)}
-                      className="text-red-400 hover:underline"
-                    >
-                      🗑️
-                    </button>
-                  )}
+                  {user &&
+                    q.user &&
+                    (q.user === user._id || q.user._id === user._id) && (
+                      <button
+                        onClick={() => handleDelete(q._id)}
+                        className="text-red-400 hover:underline"
+                      >
+                        🗑️
+                      </button>
+                    )}
                 </div>
               </div>
             ))}

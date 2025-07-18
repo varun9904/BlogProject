@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { getBlogs, deleteBlog, deleteComment } from "../services/api";
+import GifComponent from "../components/LoadingGif";
 
 export default function Profile() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [myBlogs, setMyBlogs] = useState([]);
   const [search, setSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchMyBlogs = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       const res = await getBlogs();
       const userId = user?._id;
@@ -20,6 +24,8 @@ export default function Profile() {
       setMyBlogs(filteredBlogs);
     } catch (error) {
       console.error("Error fetching blogs:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -37,7 +43,9 @@ export default function Profile() {
     fetchMyBlogs();
   }, []);
 
-  const [isDark, setIsDark] = useState(localStorage.getItem("theme") === "dark");
+  const [isDark, setIsDark] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
 
   useEffect(() => {
     if (isDark) {
@@ -56,6 +64,11 @@ export default function Profile() {
         <h2 className="text-3xl sm:text-4xl font-bold text-left text-white mb-8 border-l-4 border-orange-400 pl-4 py-2">
           📝 My Blogs
         </h2>
+        {isLoading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <GifComponent />
+          </div>
+        )}
         <div className="mb-8">
           <input
             type="text"
@@ -65,16 +78,6 @@ export default function Profile() {
             className="w-full md:w-1/2 px-4 py-2 bg-zinc-800 text-white border border-purple-600 rounded-[1vw] shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-zinc-300"
           />
         </div>
-
-        {myBlogs.some((q) => q.flagged || q.comments.some((c) => c.flagged)) && (
-          <div className="bg-red-100 border border-red-300 text-red-700 p-4 rounded-md mb-6 text-center font-medium">
-            ⚠️{" "}
-            {myBlogs.filter((q) => q.flagged || q.comments.some((c) => c.flagged))
-              .length}{" "}
-            of your blog post(s) or comments flagged as{" "}
-            <strong>hate speech</strong>.
-          </div>
-        )}
 
         {myBlogs.length === 0 ? (
           <p className="text-center text-gray-600 text-lg">
@@ -87,13 +90,11 @@ export default function Profile() {
                 q.title?.toLowerCase().includes(search.toLowerCase())
               )
               .map((q, index) => {
-                const themes = [
-                  "from-purple-900 via-indigo-800 to-gray-900",
-                ];
+                const themes = ["from-purple-900 via-indigo-800 to-gray-900"];
                 const bg = themes[index % themes.length];
-                const isFlagged = q.flagged || q.comments.some((c) => c.flagged);
-                const isOwner =
-                  q.user === user._id || q.user?._id === user._id;
+                const isFlagged =
+                  q.flagged || q.comments.some((c) => c.flagged);
+                const isOwner = q.user === user._id || q.user?._id === user._id;
 
                 return (
                   <div
@@ -110,11 +111,6 @@ export default function Profile() {
                     <p className="text-white text-justify whitespace-pre-wrap leading-loose tracking-wide px-1 md:px-2 font-sans text-[17px]">
                       {q.text}
                     </p>
-                    {isFlagged && (
-                      <p className="mt-3 text-sm text-red-600 font-medium">
-                        ⚠️ This blog or its comments were flagged as hate speech by AI.
-                      </p>
-                    )}
                     <div className="mt-6 flex items-center justify-between border-t pt-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2 px-4 py-1.5 rounded-full shadow-inner text-orange-700 font-semibold tracking-wide">
                         💜 {q.likes.length}
@@ -146,18 +142,26 @@ export default function Profile() {
                                       key={c._id}
                                       className="relative bg-red-100 border border-red-300 px-4 py-2 rounded-md shadow-sm text-sm text-red-800"
                                     >
-                                      <p className="leading-relaxed mb-1">{c.text}</p>
+                                      <p className="leading-relaxed mb-1">
+                                        {c.text}
+                                      </p>
                                       <div className="flex justify-between text-xs italic text-red-700">
-                                        <span>👤 {c.user?.name || "Anonymous"}</span>
                                         <span>
-                                          {new Date(c.createdAt).toLocaleString("en-IN", {
-                                            dateStyle: "medium",
-                                            timeStyle: "short",
-                                          })}
+                                          👤 {c.user?.name || "Anonymous"}
+                                        </span>
+                                        <span>
+                                          {new Date(c.createdAt).toLocaleString(
+                                            "en-IN",
+                                            {
+                                              dateStyle: "medium",
+                                              timeStyle: "short",
+                                            }
+                                          )}
                                         </span>
                                       </div>
                                       <p className="text-xs mt-1 italic text-red-600">
-                                        🔥 Hate Level: {c.hatePercent?.toFixed(2)}%
+                                        🔥 Hate Level:{" "}
+                                        {c.hatePercent?.toFixed(2)}%
                                       </p>
                                       {isOwner && (
                                         <button
@@ -188,14 +192,21 @@ export default function Profile() {
                                     key={c._id}
                                     className="bg-white border border-gray-200 px-4 py-2 rounded-md shadow-sm text-sm text-gray-800"
                                   >
-                                    <p className="leading-relaxed mb-1">{c.text}</p>
+                                    <p className="leading-relaxed mb-1">
+                                      {c.text}
+                                    </p>
                                     <div className="flex justify-between text-xs italic text-gray-500">
-                                      <span>👤 {c.user?.name || "Anonymous"}</span>
                                       <span>
-                                        {new Date(c.createdAt).toLocaleString("en-IN", {
-                                          dateStyle: "medium",
-                                          timeStyle: "short",
-                                        })}
+                                        👤 {c.user?.name || "Anonymous"}
+                                      </span>
+                                      <span>
+                                        {new Date(c.createdAt).toLocaleString(
+                                          "en-IN",
+                                          {
+                                            dateStyle: "medium",
+                                            timeStyle: "short",
+                                          }
+                                        )}
                                       </span>
                                     </div>
                                   </div>
