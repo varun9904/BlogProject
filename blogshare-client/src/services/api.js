@@ -15,4 +15,5 @@ export const addComment = (blogId, commentData) => {
   return API.post(`/blogs/${blogId}/comments`, commentData);
 };
 export const deleteComment = (blogId, commentId) => API.delete(`/blogs/${blogId}/comments/${commentId}`);
+export const getCurrentUser = () => API.get("/auth/me");
 

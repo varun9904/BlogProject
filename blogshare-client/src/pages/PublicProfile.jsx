@@ -15,9 +15,9 @@ export default function PublicProfile() {
     fetchData();
   }, [authorId, blogId]);
 
-  const fetchData = async () => {
+  const fetchData = async (showLoader = true) => {
     if (isLoading) return;
-    setIsLoading(true);
+    if (showLoader) setIsLoading(true);
     try {
       const res = await getBlogs();
       const filtered = res.data.find(
@@ -29,7 +29,7 @@ export default function PublicProfile() {
     } catch {
       toast.error("Error loading blog");
     } finally {
-      setIsLoading(false);
+      if (showLoader) setIsLoading(false);
     }
   };
 
@@ -37,7 +37,7 @@ export default function PublicProfile() {
     try {
       setLiked(true);
       await likeBlog(id);
-      fetchData();
+      fetchData(false);
       setTimeout(() => setLiked(false), 500);
     } catch {
       toast.error("Error liking post");

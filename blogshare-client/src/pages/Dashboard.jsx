@@ -7,10 +7,9 @@ import {
   likeBlog,
   deleteBlog,
   logoutUser,
+  getCurrentUser,
 } from "../services/api";
 import GifComponent from "../components/LoadingGif";
-
-const user = JSON.parse(localStorage.getItem("user"));
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,15 +18,15 @@ export default function Dashboard() {
   const [blogs, setBlogs] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  // const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetchBlogs();
+    fetchUserAndBlogs();
   }, []);
 
-  const fetchBlogs = async () => {
+  const fetchBlogs = async (showLoader = true) => {
     if (isLoading) return;
-    setIsLoading(true);
+    if (showLoader) setIsLoading(true);
     try {
       const res = await getBlogs();
       setBlogs(res.data);
@@ -35,7 +34,18 @@ export default function Dashboard() {
       toast.error("Failed to fetch blogs");
       console.error(err);
     } finally {
-      setIsLoading(false);
+      if (showLoader) setIsLoading(false);
+    }
+  };
+  const fetchUserAndBlogs = async () => {
+    try {
+      const res = await getCurrentUser();
+      setUser(res.data); 
+      fetchBlogs(); 
+    } catch (err) {
+      console.error("User fetch failed:", err);
+      toast.error("Session expired. Please log in again.");
+      navigate("/login");
     }
   };
 
@@ -70,7 +80,7 @@ export default function Dashboard() {
   const handleLike = async (id) => {
     try {
       await likeBlog(id);
-      fetchBlogs();
+      fetchBlogs(false);
     } catch (err) {
       toast.error("Could not like the blog. Please try again.");
       console.error(err);
@@ -91,8 +101,8 @@ export default function Dashboard() {
   const logout = async () => {
     try {
       await logoutUser();
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+      setUser(null);
+      navigate("/login");
     } catch (err) {
       console.error("Logout failed:", err);
     }

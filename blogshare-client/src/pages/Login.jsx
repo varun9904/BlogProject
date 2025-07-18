@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { loginUser } from "../services/api";
+import { loginUser, getCurrentUser } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast"; // <-- import toast
 
@@ -14,34 +14,35 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await loginUser(formData);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      await loginUser(formData); 
+      const res = await getCurrentUser(); 
+      console.log("Logged in user:", res.data); 
+
       toast.success("Login successful! 🎉");
       navigate("/dashboard");
-  } catch (err) {
-    toast.error("Login failed");
-  }
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("Login failed");
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-neutral-950 flex items-center justify-center px-4">
       <div className="w-full max-w-4xl flex flex-col md:flex-row bg-zinc-900 text-white shadow-2xl rounded-3xl overflow-hidden border border-zinc-700">
-        
         <div className="hidden md:flex w-1/2 bg-zinc-800 items-center justify-center flex-col p-10 border-r border-zinc-700">
           <blockblog className="text-xl italic text-purple-300 text-center max-w-sm">
-          “Every blog is a snapshot of a thought, shared to echo, inspire, or simply be heard.”
+            “Every blog is a snapshot of a thought, shared to echo, inspire, or
+            simply be heard.”
           </blockblog>
           <p className="mt-4 text-sm text-zinc-400">~ BlogShare</p>
         </div>
-  
+
         {/* Right side: Login Form */}
         <div className="w-full md:w-1/2 p-8">
           <h2 className="text-3xl mb-6 text-center font-extrabold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-200">
             blogshare
           </h2>
 
-  
           <form onSubmit={handleSubmit} className="space-y-5">
             <input
               name="email"
@@ -64,10 +65,13 @@ export default function Login() {
               Login
             </button>
           </form>
-  
+
           <p className="mt-6 text-xs text-center text-zinc-500">
             Don&apos;t have an account?{" "}
-            <a href="/register" className="underline text-purple-400 hover:text-purple-300">
+            <a
+              href="/register"
+              className="underline text-purple-400 hover:text-purple-300"
+            >
               Sign Up
             </a>
           </p>
@@ -75,7 +79,4 @@ export default function Login() {
       </div>
     </div>
   );
-  
-  
-
 }
