@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { getBlogs, likeBlog, addComment } from "../services/api";
 import toast from "react-hot-toast";
 
-
 export default function PublicProfile() {
   const { authorId, blogId } = useParams();
   const [blog, setBlog] = useState(null);
@@ -18,8 +17,10 @@ export default function PublicProfile() {
     try {
       const res = await getBlogs();
       const filtered = res.data.find(
-        (q) => q._id === blogId && (q.user?._id === authorId || q.user === authorId)
+        (q) =>
+          q._id === blogId && (q.user?._id === authorId || q.user === authorId)
       );
+      console.log("Fetched blog:", filtered);
       setBlog(filtered || null);
     } catch {
       toast.error("Error loading blog");
@@ -42,10 +43,12 @@ export default function PublicProfile() {
     if (!comment || !blog) return;
     try {
       await addComment(blog._id, { text: comment });
+      console.log("Add comment response:", res.data);
       setComment("");
-      fetchData();
+      setBlog(res.data.blog);
     } catch {
       toast.error("Failed to comment");
+      fetchData();
     }
   };
 
@@ -61,7 +64,6 @@ export default function PublicProfile() {
 
             {/* 🟪 Blog Card */}
             <div className="relative bg-gradient-to-br from-purple-900 via-indigo-800 to-gray-900 p-8 border border-zinc-700 rounded-lg shadow-xl transition-all duration-300 hover:shadow-2xl">
-
               {/* ✒️ Author */}
               <div className="absolute top-4 right-6 text-sm text-purple-300 italic font-medium uppercase">
                 ✒️ – by {blog.user?.name || "Unknown"}
@@ -108,43 +110,41 @@ export default function PublicProfile() {
               {/* 💬 Comments */}
               {blog.comments?.length > 0 && (
                 <div className="mt-8 max-h-72 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-400 scrollbar-track-zinc-700 space-y-5">
-                  {blog.comments.map((c) => (
-                    <div
-                      key={c._id}
-                      className={`border px-6 py-4 rounded-md shadow-sm hover:shadow-md transition duration-300 ${
-                        c.flagged
-                          ? "bg-red-100 border-red-300 text-red-800"
-                          : "bg-white border-gray-200 text-gray-800"
-                      }`}
-                    >
-                      {/* 👤 Comment Header */}
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm flex items-center gap-1">
-                          👤 {c.user?.name || "Anonymous"}
-                        </span>
-                        <span className="text-xs">
-                          {c.createdAt
-                            ? new Date(c.createdAt).toLocaleString("en-IN", {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              })
-                            : "Unknown"}
-                        </span>
-                      </div>
-
-                      {/* ✍️ Comment Text */}
-                      <p className="text-[16px] leading-[1.8] tracking-wide font-[500] font-serif">
-                        {c.text}
-                      </p>
-
-                      {/* ⚠️ Hate Level if flagged */}
-                      {c.flagged && (
-                        <p className="text-sm mt-1 italic text-red-600">
-                          ⚠️ Hate Level: {c.hatePercent?.toFixed(2)}%
+                  {blog.comments.map((c) => {
+                    console.log("Rendering comment:", c); 
+                    return (
+                      <div
+                        key={c._id}
+                        className={`border px-6 py-4 rounded-md shadow-sm hover:shadow-md transition duration-300 ${
+                          c.flagged
+                            ? "bg-red-100 border-red-300 text-red-800"
+                            : "bg-white border-gray-200 text-gray-800"
+                        }`}
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm flex items-center gap-1">
+                            👤 {c.user?.name || "Anonymous"}
+                          </span>
+                          <span className="text-xs">
+                            {c.createdAt
+                              ? new Date(c.createdAt).toLocaleString("en-IN", {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })
+                              : "Unknown"}
+                          </span>
+                        </div>
+                        <p className="text-[16px] leading-[1.8] tracking-wide font-[500] font-serif">
+                          {c.text}
                         </p>
-                      )}
-                    </div>
-                  ))}
+                        {c.flagged && (
+                          <p className="text-sm mt-1 italic text-red-600">
+                            ⚠️ Hate Level: {c.hatePercent?.toFixed(2)}%
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

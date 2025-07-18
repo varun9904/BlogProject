@@ -8,7 +8,6 @@ const checkHateSpeech = async (text) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
-      credentials: "include",
     });
     const data = await res.json();
     const flagged = data.prediction === "Hate Speech";
@@ -127,6 +126,7 @@ export const createComment = async (req, res) => {
     }
 
     const { flagged, hatePercent } = await checkHateSpeech(text);
+    console.log("Comment data:", { text, flagged, hatePercent, userId });
 
     const comment = {
       text,
@@ -138,11 +138,11 @@ export const createComment = async (req, res) => {
     blog.comments.push(comment);
     await blog.save();
 
-    const populatedBlog = await Blog.populate(blog, [
-      { path: "user", select: "name" },
-      { path: "comments.user", select: "name" },
-    ]);
+    const populatedBlog = await Blog.findById(req.params.id)
+      .populate("user", "name")
+      .populate("comments.user", "name");
 
+    console.log("Returning populated blog:", populatedBlog); // Debug log
     res.status(201).json({ message: "Comment added", blog: populatedBlog });
   } catch (err) {
     console.error("Add comment error:", err);
