@@ -2,6 +2,24 @@ import Blog from "../models/Blog.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 
+const checkHateSpeech = async (text) => {
+  try {
+    const res = await fetch(`${process.env.VITE_AI_URL}/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+      credentials: "include",
+    });
+    const data = await res.json();
+    const flagged = data.prediction === "Hate Speech";
+    const hatePercent = (data.probabilities?.hate || 0) * 100;
+    return { flagged, hatePercent };
+  } catch (err) {
+    console.error("Error in hate speech detection:", err);
+    return { flagged: false, hatePercent: 0 };
+  }
+};
+
 export const createBlog = async (req, res) => {
   console.log("req.userId:", req.userId);
   const { title, text, flagged = false } = req.body;
@@ -108,16 +126,24 @@ export const createComment = async (req, res) => {
       }
     }
 
+    const { flagged, hatePercent } = await checkHateSpeech(text);
+
     const comment = {
-      text: req.body.text,
-      flagged: req.body.flagged,
+      text,
+      flagged,
+      hatePercent,
       user: userId, // Either ObjectId or null (for anonymous)
     };
 
     blog.comments.push(comment);
     await blog.save();
 
-    res.status(201).json({ message: "Comment added", blog });
+    const populatedBlog = await Blog.populate(blog, [
+      { path: "user", select: "name" },
+      { path: "comments.user", select: "name" },
+    ]);
+
+    res.status(201).json({ message: "Comment added", blog: populatedBlog });
   } catch (err) {
     console.error("Add comment error:", err);
     res.status(500).json({ message: "Internal server error" });

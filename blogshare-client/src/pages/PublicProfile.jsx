@@ -3,24 +3,6 @@ import { useEffect, useState } from "react";
 import { getBlogs, likeBlog, addComment } from "../services/api";
 import toast from "react-hot-toast";
 
-// ✅ Hate Speech Detection Function
-const checkHateSpeech = async (text) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_AI_URL}/predict`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-      credentials: "include",
-    });
-    const data = await res.json();
-    const flagged = data.prediction === "Hate Speech";
-    const hatePercent = (data.probabilities?.hate || 0) * 100;
-    return { flagged, hatePercent };
-  } catch (err) {
-    console.error("Error in hate speech detection:", err);
-    return { flagged: false, hatePercent: 0 };
-  }
-};
 
 export default function PublicProfile() {
   const { authorId, blogId } = useParams();
@@ -38,23 +20,7 @@ export default function PublicProfile() {
       const filtered = res.data.find(
         (q) => q._id === blogId && (q.user?._id === authorId || q.user === authorId)
       );
-
-      if (filtered) {
-        // Enhance each comment with AI-based hate detection
-        const updatedComments = await Promise.all(
-          filtered.comments.map(async (c) => {
-            const result = await checkHateSpeech(c.text);
-            return {
-              ...c,
-              flagged: result.flagged,
-              hatePercent: result.hatePercent,
-            };
-          })
-        );
-        setBlog({ ...filtered, comments: updatedComments });
-      } else {
-        setBlog(null);
-      }
+      setBlog(filtered || null);
     } catch {
       toast.error("Error loading blog");
     }

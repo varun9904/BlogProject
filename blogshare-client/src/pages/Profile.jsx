@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { getBlogs, deleteBlog, deleteComment } from "../services/api";
 
-const checkHateSpeech = async (text) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_AI_URL}/predict`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-      credentials: "include",
-    });
-    const data = await res.json();
-    const flagged = data.prediction === "Hate Speech";
-    const hatePercent = (data.probabilities?.hate || 0) * 100;
-    return { flagged, hatePercent };
-  } catch (err) {
-    console.error("Error in hate speech detection:", err);
-    return { flagged: false, hatePercent: 0 };
-  }
-};
+// const checkHateSpeech = async (text) => {
+//   try {
+//     const res = await fetch(`${import.meta.env.VITE_AI_URL}/predict`, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ text }),
+//       credentials: "include",
+//     });
+//     const data = await res.json();
+//     const flagged = data.prediction === "Hate Speech";
+//     const hatePercent = (data.probabilities?.hate || 0) * 100;
+//     return { flagged, hatePercent };
+//   } catch (err) {
+//     console.error("Error in hate speech detection:", err);
+//     return { flagged: false, hatePercent: 0 };
+//   }
+// };
 
 export default function Profile() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -26,31 +26,19 @@ export default function Profile() {
 
 
   const fetchMyBlogs = async () => {
-    const res = await getBlogs();
-    const userId = user?._id;
+    try {
+      const res = await getBlogs();
+      const userId = user?._id;
 
-    const enhancedBlogs = await Promise.all(
-      res.data
-        .filter((q) => {
-          const blogUserId = typeof q.user === "string" ? q.user : q.user?._id;
-          return blogUserId === userId;
-        })
-        .map(async (blog) => {
-          const enhancedComments = await Promise.all(
-            blog.comments.map(async (c) => {
-              const result = await checkHateSpeech(c.text);
-              return {
-                ...c,
-                flagged: result.flagged,
-                hatePercent: result.hatePercent,
-              };
-            })
-          );
-          return { ...blog, comments: enhancedComments };
-        })
-    );
+      const filteredBlogs = res.data.filter((q) => {
+        const blogUserId = typeof q.user === "string" ? q.user : q.user?._id;
+        return blogUserId === userId;
+      });
 
-    setMyBlogs(enhancedBlogs);
+      setMyBlogs(filteredBlogs);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    }
   };
 
   const handleDelete = async (id) => {

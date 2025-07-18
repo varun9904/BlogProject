@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const commentSchema = new mongoose.Schema({
   text: { type: String, required: true },
   flagged: { type: Boolean, default: false },
+  hatePercent: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
