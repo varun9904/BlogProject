@@ -9,7 +9,7 @@ export default function PublicProfile() {
   const [blog, setBlog] = useState(null);
   const [comment, setComment] = useState("");
   const [liked, setLiked] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -20,10 +20,10 @@ export default function PublicProfile() {
     if (showLoader) setIsLoading(true);
     try {
       const res = await getBlogs();
-      const filtered = res.data.find(
-        (q) =>
-          q._id === blogId && (q.user?._id === authorId || q.user === authorId)
-      );
+      const filtered = res.data.find((q) => {
+        const userId = typeof q.user === "object" ? q.user._id : q.user;
+        return q._id === blogId && userId === authorId;
+      });
       console.log("Fetched blog:", filtered);
       setBlog(filtered || null);
     } catch {

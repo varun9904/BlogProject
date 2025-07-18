@@ -40,8 +40,8 @@ export default function Dashboard() {
   const fetchUserAndBlogs = async () => {
     try {
       const res = await getCurrentUser();
-      setUser(res.data); 
-      fetchBlogs(); 
+      setUser(res.data);
+      fetchBlogs();
     } catch (err) {
       console.error("User fetch failed:", err);
       toast.error("Session expired. Please log in again.");
@@ -129,19 +129,24 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="flex gap-3">
-            <Link
-              to="/profile"
-              className="bg-gradient-to-r from-purple-900 to-fuchsia-900 text-white px-6 py-3 rounded-[1vw] font-semibold shadow-md border border-purple-800 hover:scale-105 hover:shadow-lg hover:border-fuchsia-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
-            >
-              View Profile
-            </Link>
-            <button
-              onClick={() => logout()}
-              className="bg-gradient-to-r from-red-900 to-red-900 text-white px-6 py-3 rounded-[2vw] font-semibold shadow-md border border-red-800 hover:scale-105 hover:shadow-lg hover:border-fuchsia-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
-            >
-              Logout
-            </button>
+          <div className="flex flex-col items-end gap-2 mt-4 -ml-4">
+            <div className="flex gap-3">
+              <Link
+                to="/profile"
+                className="bg-gradient-to-r from-purple-900 to-fuchsia-900 text-white px-6 py-3 rounded-[1vw] font-semibold shadow-md border border-purple-800 hover:scale-105 hover:shadow-lg hover:border-fuchsia-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
+              >
+                My Blogs
+              </Link>
+              <button
+                onClick={() => logout()}
+                className="bg-gradient-to-r from-red-900 to-red-900 text-white px-6 py-3 rounded-[2vw] font-semibold shadow-md border border-red-800 hover:scale-105 hover:shadow-lg hover:border-fuchsia-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
+              >
+                Logout
+              </button>
+            </div>
+            <p className="text-sm sm:text-base text-purple-300 font-medium">
+              Hello! {user?.name || "User"}!
+            </p>
           </div>
         </div>
 
