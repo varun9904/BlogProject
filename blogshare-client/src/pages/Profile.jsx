@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  getBlogs,
-  deleteBlog,
-  deleteComment,
-  getCurrentUser,
-} from "../services/api";
+import { getBlogs, deleteBlog, deleteComment } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 import GifComponent from "../components/LoadingGif";
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
+  const { user, loadingUser } = useAuth();
   const [myBlogs, setMyBlogs] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -45,19 +41,10 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    const fetchUserAndBlogs = async () => {
-      try {
-        const res = await getCurrentUser();
-        setUser(res.data);
-      } catch (err) {
-        console.error("User not logged in", err);
-        return;
-      }
+    if (user && !loadingUser) {
       fetchMyBlogs();
-    };
-
-    fetchUserAndBlogs();
-  }, []);
+    }
+  }, [user, loadingUser]);
 
   return (
     <div className="min-h-screen bg-black px-4 sm:px-6 py-12 md:py-16 transition-all duration-500">

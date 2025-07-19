@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { getBlogs, likeBlog, addComment } from "../services/api";
 import toast from "react-hot-toast";
 import GifComponent from "../components/LoadingGif";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function PublicProfile() {
   const { authorId, blogId } = useParams();
+  const { user, loadingUser } = useAuth();
   const [blog, setBlog] = useState(null);
   const [comment, setComment] = useState("");
   const [liked, setLiked] = useState(false);
@@ -58,6 +60,14 @@ export default function PublicProfile() {
       fetchData();
     }
   };
+
+  if (loadingUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <GifComponent />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-neutral-950 px-4 sm:px-8 py-12 md:py-16 transition-all duration-500">

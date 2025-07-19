@@ -10,6 +10,7 @@ import {
   getCurrentUser,
 } from "../services/api";
 import GifComponent from "../components/LoadingGif";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -18,11 +19,9 @@ export default function Dashboard() {
   const [blogs, setBlogs] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, loadingUser, logout } = useAuth();
 
-  useEffect(() => {
-    fetchUserAndBlogs();
-  }, []);
+  
 
   const fetchBlogs = async (showLoader = true) => {
     if (isLoading) return;
@@ -37,17 +36,10 @@ export default function Dashboard() {
       if (showLoader) setIsLoading(false);
     }
   };
-  const fetchUserAndBlogs = async () => {
-    try {
-      const res = await getCurrentUser();
-      setUser(res.data);
-      fetchBlogs();
-    } catch (err) {
-      console.error("User fetch failed:", err);
-      toast.error("Session expired. Please log in again.");
-      navigate("/login");
-    }
-  };
+
+  useEffect(() => {
+    if (user && !loadingUser) fetchBlogs();
+  }, [user, loadingUser]);
 
   const filteredBlogs = blogs.filter((q) => {
     const author = q.user?.name?.toLowerCase() || "";
@@ -98,15 +90,13 @@ export default function Dashboard() {
     }
   };
 
-  const logout = async () => {
-    try {
-      await logoutUser();
-      setUser(null);
-      navigate("/login");
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
+  if (loadingUser) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-black text-white">
+        <GifComponent />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-neutral-950 px-4 py-10 text-white">
