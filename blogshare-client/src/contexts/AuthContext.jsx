@@ -7,7 +7,6 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,13 +24,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = async () => {
-    try {
-      await logoutUser();
-      setUser(null);
-      navigate("/login"); 
-    } catch (err) {
-      console.error("Logout failed", err);
-    }
+    await logoutUser();
+    setUser(null);
   };
 
   return (

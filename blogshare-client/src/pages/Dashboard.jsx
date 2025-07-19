@@ -21,8 +21,6 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, loadingUser, logout } = useAuth();
 
-  
-
   const fetchBlogs = async (showLoader = true) => {
     if (isLoading) return;
     if (showLoader) setIsLoading(true);
@@ -90,6 +88,11 @@ export default function Dashboard() {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login"); 
+  };
+
   if (loadingUser) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-black text-white">
@@ -128,7 +131,7 @@ export default function Dashboard() {
                 My Blogs
               </Link>
               <button
-                onClick={() => logout()}
+                onClick={handleLogout}
                 className="bg-gradient-to-r from-red-900 to-red-900 text-white px-6 py-3 rounded-[2vw] font-semibold shadow-md border border-red-800 hover:scale-105 hover:shadow-lg hover:border-fuchsia-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
               >
                 Logout
