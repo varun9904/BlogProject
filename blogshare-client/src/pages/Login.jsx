@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { loginUser, getCurrentUser } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast"; // <-- import toast
+import toast from "react-hot-toast"; 
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
