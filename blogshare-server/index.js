@@ -11,13 +11,15 @@ const app = express();
 
 app.use(cors({
   origin: "https://blog-project-opal-six.vercel.app",
-  credentials: true      
+  credentials: true,
+  methods: ["GET","POST","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"]
 }));
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Credentials", "true");
+//   next();
+// });
 
 app.use(cookieParser());
 app.use(express.json());
