@@ -14,19 +14,10 @@ import speech_recognition as sr
 from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 
-
-nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
-os.makedirs(nltk_data_dir, exist_ok=True)
-
-if nltk_data_dir not in nltk.data.path:
-    nltk.data.path.append(nltk_data_dir)
-
-for pkg in ["stopwords", "punkt", "wordnet", "omw-1.4", "punkt_tab"]:
-    try:
-        nltk.data.find(f"corpora/{pkg}")
-    except LookupError:
-        nltk.download(pkg, download_dir=nltk_data_dir)
-        
+NLTK_DATA_DIR = os.path.join(os.getcwd(), "nltk_data")
+if not os.path.exists(NLTK_DATA_DIR):
+    os.makedirs(NLTK_DATA_DIR)
+nltk.data.path.append(NLTK_DATA_DIR)       
 
 
 app = FastAPI()
