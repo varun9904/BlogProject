@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { loginUser, getCurrentUser } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast"; // <-- import toast
+import {useAuth} from "../contexts/AuthContext"
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const {setUser} = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,7 +19,7 @@ export default function Login() {
       await loginUser(formData); 
       const res = await getCurrentUser(); 
       console.log("Logged in user:", res.data); 
-
+      setUser(res.data);
       toast.success("Login successful! 🎉");
       navigate("/dashboard");
     } catch (err) {
