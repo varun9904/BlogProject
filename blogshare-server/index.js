@@ -7,7 +7,6 @@ import authRoutes from "./routes/authRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 
 const app = express();
-// app.use(cors());
 
 app.use(cors({
   origin: "https://blog-project-opal-six.vercel.app",
@@ -16,14 +15,9 @@ app.use(cors({
   allowedHeaders: ["Content-Type","Authorization"]
 }));
 
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Credentials", "true");
-//   next();
-// });
 
 app.use(cookieParser());
 app.use(express.json());
-// app.use(cookieParser());
 
 
 app.get("/", (req, res) => res.send("Welcome to the blogShare API"));

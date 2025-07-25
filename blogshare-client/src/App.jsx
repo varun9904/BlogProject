@@ -6,31 +6,17 @@ import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import PrivateRoute from "./components/PrivateRoute";
 import { Toaster } from "react-hot-toast";
-import { useEffect, useState } from "react";
-import { getCurrentUser } from "./services/api";
+import { useAuth } from "./contexts/AuthContext";
 import GifComponent from "./components/LoadingGif";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await getCurrentUser();
-        setUser(res.data);
-      } catch {
-        setUser(null);
-      } finally {
-        setLoadingUser(false); 
-      }
-    };
-
-    fetchUser();
-  }, []);
-
+  const { user, loadingUser } = useAuth();
   if (loadingUser) {
-    return <GifComponent />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <GifComponent />
+      </div>
+    );
   }
 
   return (
@@ -43,16 +29,16 @@ function App() {
           element={<Navigate to={user ? "/dashboard" : "/login"} />}
         />
 
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+
         <Route
           path="/pubprofile/:authorId/:blogId"
           element={<PublicProfile />}
         />
 
-        <Route
-          element={<PrivateRoute user={user} />}
-        >
+
+        <Route element={<PrivateRoute user={user} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
         </Route>

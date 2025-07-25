@@ -5,7 +5,10 @@ const API = axios.create({
   withCredentials: true,
 });
 export const registerUser = (data) => API.post("/auth/register", data);
-export const loginUser = (data) => API.post("/auth/login", data);
+export const loginUser = async (data) => {
+  const response = await API.post("/auth/login", data);
+  return response.data;
+}
 export const logoutUser = () => API.post("/auth/logout");
 export const createBlog = (data) => API.post("/blogs", data);
 export const getBlogs = () => API.get("/blogs");
@@ -16,4 +19,3 @@ export const addComment = (blogId, commentData) => {
 };
 export const deleteComment = (blogId, commentId) => API.delete(`/blogs/${blogId}/comments/${commentId}`);
 export const getCurrentUser = () => API.get("/auth/me");
-
