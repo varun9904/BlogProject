@@ -81,7 +81,7 @@ async def predict_text(request: TextRequest):
         
 
 
-
+@app.head("/ping")
 @app.get("/ping")
 def ping():
     return {"status": "ok"}
